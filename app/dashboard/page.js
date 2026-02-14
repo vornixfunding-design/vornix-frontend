@@ -2,37 +2,58 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getHealth } from "@/lib/api";
 
 export default function DashboardPage() {
-  const [backendStatus, setBackendStatus] = useState("checking");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
+    let isActive = true;
 
-    getHealth()
-      .then(() => {
-        if (isMounted) {
-          setBackendStatus("connected");
+    const verifyAuthentication = async () => {
+      const token = localStorage.getItem("vornix_token");
+
+      if (!token) {
+        window.location.href = "/login";
+        return;
+      }
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          window.location.href = "/login";
+          return;
         }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setBackendStatus("error");
+
+        if (isActive) {
+          setIsLoading(false);
         }
-      });
+      } catch {
+        window.location.href = "/login";
+      }
+    };
+
+    verifyAuthentication();
 
     return () => {
-      isMounted = false;
+      isActive = false;
     };
   }, []);
 
-  const statusMessage =
-    backendStatus === "connected"
-      ? "Backend Status: Connected ✅"
-      : backendStatus === "error"
-        ? "Backend Status: Error ❌"
-        : "Backend Status: Checking...";
+  if (isLoading) {
+    return (
+      <section className="space-y-8">
+        <article className="card">
+          <p className="text-sm text-slate-300">Checking authentication...</p>
+        </article>
+      </section>
+    );
+  }
 
   return (
     <section className="space-y-8">
@@ -45,7 +66,7 @@ export default function DashboardPage() {
 
       <article className="card">
         <h2 className="text-lg font-semibold text-slate-100">System Health</h2>
-        <p className="mt-2 text-sm text-slate-300">{statusMessage}</p>
+        <p className="mt-2 text-sm text-slate-300">Backend Status: Connected ✅</p>
       </article>
 
       <div className="grid gap-4 md:grid-cols-2">
