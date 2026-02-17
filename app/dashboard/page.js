@@ -3,17 +3,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default function DashboardPage() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isActive = true;
-
-    const verifyAuthentication = async () => {
+    const enforceAuthentication = async () => {
       const token = localStorage.getItem("vornix_token");
 
       if (!token) {
-        window.location.href = "/login";
+        window.location.replace("/login");
         return;
       }
 
@@ -26,31 +26,27 @@ export default function DashboardPage() {
         });
 
         if (!response.ok) {
-          window.location.href = "/login";
+          localStorage.removeItem("vornix_token");
+          window.location.replace("/login");
           return;
         }
 
-        if (isActive) {
-          setIsLoading(false);
-        }
+        setLoading(false);
       } catch {
-        window.location.href = "/login";
+        localStorage.removeItem("vornix_token");
+        window.location.replace("/login");
       }
     };
 
-    verifyAuthentication();
-
-    return () => {
-      isActive = false;
-    };
+    enforceAuthentication();
   }, []);
 
-  if (isLoading) {
+  if (loading) {
     return (
-      <section className="space-y-8">
-        <article className="card">
-          <p className="text-sm text-slate-300">Checking authentication...</p>
-        </article>
+      <section className="flex min-h-[60vh] items-center justify-center bg-slate-950">
+        <div className="rounded-xl border border-slate-800 bg-slate-900 px-6 py-4 shadow-lg">
+          <p className="text-sm font-medium text-slate-200">Authenticating...</p>
+        </div>
       </section>
     );
   }
