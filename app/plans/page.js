@@ -123,7 +123,7 @@ export default function PlansPage() {
           throw new Error("Missing NEXT_PUBLIC_API_URL environment variable.");
         }
 
-        const response = await fetch(`${apiUrl}/plans`, {
+        const response = await fetch(`${apiUrl}/api/plans`, {
           signal: controller.signal,
         });
 
