@@ -11,12 +11,19 @@
 }
 
 body {
-  @apply bg-slate-950 text-slate-100;
+  @apply bg-slate-950 text-slate-200 antialiased;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgb(6 182 212 / 0.18), transparent 34%),
+    radial-gradient(circle at 85% 5%, rgb(59 130 246 / 0.14), transparent 32%);
 }
 
 @layer components {
+  .section-title {
+    @apply text-3xl font-semibold tracking-tight text-white md:text-4xl;
+  }
+
   .card {
-    @apply rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-soft backdrop-blur;
+    @apply rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg transition hover:shadow-cyan-500/20;
   }
 
   .page-title {
@@ -25,5 +32,15 @@ body {
 
   .page-subtitle {
     @apply mt-2 max-w-2xl text-sm text-slate-400;
+  }
+}
+
+@layer utilities {
+  .glow-ring {
+    box-shadow: 0 0 0 1px rgb(34 211 238 / 0.2), 0 8px 50px rgb(6 182 212 / 0.18);
+  }
+
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-1;
   }
 }
