@@ -1,44 +1,100 @@
-import Link from 'next/link';
+"use client";
 
-export default function LandingPage() {
+export default function HomePage() {
   return (
-    <section className="space-y-10">
-      <div className="space-y-6">
-        <p className="inline-flex rounded-full border border-brand-500/40 bg-brand-500/10 px-3 py-1 text-xs uppercase tracking-[0.2em] text-brand-200">
-          Fintech SaaS Platform
-        </p>
-        <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-slate-50 md:text-5xl">
-          Build financial clarity with a platform designed for modern operations.
-        </h1>
-        <p className="max-w-2xl text-base text-slate-300 md:text-lg">
-          Vornix helps teams centralize evaluations, streamline account oversight, and elevate executive reporting in one secure workspace.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/dashboard"
-            className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-brand-400"
-          >
-            Enter Dashboard
-          </Link>
-          <Link
-            href="/login"
-            className="rounded-lg border border-slate-700 px-5 py-2.5 text-sm font-medium text-slate-200 transition hover:border-slate-500 hover:text-white"
-          >
-            Sign In
-          </Link>
-        </div>
-      </div>
+    <main className="space-y-24 pb-8">
+      {/* HERO SECTION */}
+      <section className="relative overflow-hidden pt-20 pb-32 text-center">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-cyan-500/10 to-transparent blur-3xl" />
+        <div className="pointer-events-none absolute left-1/2 top-20 h-56 w-56 -translate-x-1/2 rounded-full bg-cyan-400/20 blur-[110px]" />
 
-      <div className="grid gap-4 md:grid-cols-3">
-        {['Portfolio Intelligence', 'Risk Evaluation', 'Account Governance'].map((item) => (
-          <article key={item} className="card">
-            <h2 className="text-base font-semibold text-slate-100">{item}</h2>
-            <p className="mt-2 text-sm text-slate-400">
-              Structured modules ready for production integrations and secure financial workflows.
-            </p>
-          </article>
-        ))}
-      </div>
-    </section>
+        <h1 className="relative text-5xl font-bold text-white drop-shadow-xl md:text-6xl">
+          Trade. Pass. Get Funded.
+        </h1>
+        <p className="relative mx-auto mt-4 max-w-2xl text-lg text-slate-400">
+          Vornix is the next-gen prop firm offering fast evaluation, high payouts, and strict transparency with zero
+          hidden rules.
+        </p>
+
+        <div className="relative mt-8 flex flex-wrap justify-center gap-4">
+          <a
+            href="/plans"
+            className="glow-ring rounded-xl bg-cyan-500 px-6 py-3 font-semibold text-slate-900 transition hover:bg-cyan-400"
+          >
+            Get Funded
+          </a>
+          <a
+            href="/login"
+            className="rounded-xl border border-slate-700 px-6 py-3 text-white transition hover:border-cyan-400"
+          >
+            Login
+          </a>
+        </div>
+      </section>
+
+      {/* WHY CHOOSE VORNIX */}
+      <section className="mx-auto max-w-6xl space-y-12 px-6 md:px-8">
+        <h2 className="section-title text-center">Why Traders Choose Vornix</h2>
+
+        <div className="grid gap-6 md:grid-cols-3">
+          <div className="card hover-lift">
+            <h3 className="mb-2 text-xl font-semibold text-white">90–95% Payouts</h3>
+            <p className="text-slate-400">Highest payout tiers in the industry with bi-weekly withdrawals.</p>
+          </div>
+
+          <div className="card hover-lift">
+            <h3 className="mb-2 text-xl font-semibold text-white">No Time Limits</h3>
+            <p className="text-slate-400">Trade at your own pace. No forced deadlines. No pressure.</p>
+          </div>
+
+          <div className="card hover-lift">
+            <h3 className="mb-2 text-xl font-semibold text-white">Strict &amp; Clean Rules</h3>
+            <p className="text-slate-400">5% daily drawdown, 10% max drawdown — applies to every plan.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ACCOUNT MODELS */}
+      <section className="mx-auto max-w-6xl space-y-6 px-6 md:px-8">
+        <h2 className="section-title text-center">Evaluation Models</h2>
+        <p className="mx-auto max-w-2xl text-center text-slate-400">
+          Choose between 1-Step, 2-Step, or 3-Step challenges. Designed for every trading style — from fast-track to
+          affordable entry.
+        </p>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <a href="/plans" className="card hover-lift cursor-pointer hover:border-cyan-500">
+            <h3 className="text-xl font-semibold">1-Step</h3>
+            <p className="mt-2 text-slate-400">10% target • Premium Fast-Track</p>
+          </a>
+
+          <a href="/plans" className="card hover-lift cursor-pointer hover:border-cyan-500">
+            <h3 className="text-xl font-semibold">2-Step</h3>
+            <p className="mt-2 text-slate-400">8% + 5% • Our main model</p>
+          </a>
+
+          <a href="/plans" className="card hover-lift cursor-pointer hover:border-cyan-500">
+            <h3 className="text-xl font-semibold">3-Step</h3>
+            <p className="mt-2 text-slate-400">8% + 6% + 4% • Cheapest starter</p>
+          </a>
+        </div>
+      </section>
+
+      {/* CTA SECTION */}
+      <section className="bg-gradient-to-b from-slate-900 to-slate-950 px-6 py-20 text-center md:px-8">
+        <h2 className="text-4xl font-bold text-white">Ready to Start Trading?</h2>
+        <p className="mt-4 text-slate-400">Start your evaluation and join a new generation of funded traders.</p>
+
+        <a
+          href="/plans"
+          className="glow-ring mt-8 inline-block rounded-xl bg-cyan-500 px-8 py-4 text-lg font-bold text-slate-900 transition hover:bg-cyan-400"
+        >
+          Start Now
+        </a>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="py-10 text-center text-sm text-slate-500">© {new Date().getFullYear()} Vornix Funding. All rights reserved.</footer>
+    </main>
   );
 }
