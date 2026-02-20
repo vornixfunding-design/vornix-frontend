@@ -1,109 +1,102 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { apiPost } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [step, setStep] = useState("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event) => {
-    console.log("[LoginPage] handleSubmit triggered");
-    event.preventDefault();
-    setError("");
-    setLoading(true);
-
+  const sendOtp = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      setLoading(true);
+      setError("");
+      await apiPost("/otp/send", { email });
+      setStep("otp");
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      const data = await response.json();
+  const loginWithOtp = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-      if (!response.ok) {
-        setError(data?.message || "Unable to log in. Please check your credentials.");
-        return;
-      }
+      await apiPost("/otp/verify", { email, otp });
 
-      localStorage.setItem("vornix_token", data.token);
+      const res = await apiPost("/auth/login", { email, password });
+
+      localStorage.setItem("token", res.token);
       router.push("/dashboard");
-    } catch (requestError) {
-      setError("Unable to log in right now. Please try again in a moment.");
+    } catch (e) {
+      setError(e.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="mx-auto w-full max-w-md">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-8 shadow-[0_0_80px_-50px_rgba(14,165,233,0.35)] backdrop-blur">
-        <div className="mb-6 space-y-2 text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.22em] text-cyan-300/80">Vornix Access</p>
-          <h1 className="text-2xl font-semibold text-slate-100">Sign in to your account</h1>
-          <p className="text-sm text-slate-400">Secure access to your fintech dashboard.</p>
-        </div>
+    <section className="max-w-md mx-auto space-y-6">
+      <h1 className="text-3xl font-semibold text-white">Login</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm text-slate-300" htmlFor="email">
-              Email address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
-              placeholder="name@company.com"
-              required
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm text-slate-100 outline-none transition focus:border-cyan-400"
-            />
-          </div>
+      {error && (
+        <p className="p-3 rounded bg-red-500/20 text-red-300 text-sm">{error}</p>
+      )}
 
-          <div className="space-y-2">
-            <label className="text-sm text-slate-300" htmlFor="password">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete="current-password"
-              placeholder="••••••••"
-              required
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm text-slate-100 outline-none transition focus:border-cyan-400"
-            />
-          </div>
+      {step === "email" && (
+        <div className="space-y-3">
+          <input
+            className="w-full p-3 bg-slate-900 border border-slate-700 rounded"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-          {error ? (
-            <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>
-          ) : null}
+          <input
+            className="w-full p-3 bg-slate-900 border border-slate-700 rounded"
+            placeholder="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
           <button
-            type="submit"
+            className="w-full p-3 rounded bg-cyan-500 text-slate-900 font-semibold"
+            onClick={sendOtp}
             disabled={loading}
-            className="w-full rounded-lg bg-cyan-500 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Sending..." : "Send OTP"}
           </button>
-        </form>
+        </div>
+      )}
 
-        <p className="mt-6 text-center text-sm text-slate-400">
-          New to Vornix?{" "}
-          <Link href="/signup" className="font-medium text-cyan-300 hover:text-cyan-200">
-            Create an account
-          </Link>
-        </p>
-      </div>
+      {step === "otp" && (
+        <div className="space-y-3">
+          <input
+            className="w-full p-3 bg-slate-900 border border-slate-700 rounded"
+            placeholder="Enter OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+          />
+
+          <button
+            className="w-full p-3 rounded bg-cyan-500 text-slate-900 font-semibold"
+            onClick={loginWithOtp}
+            disabled={loading}
+          >
+            {loading ? "Verifying..." : "Login"}
+          </button>
+        </div>
+      )}
     </section>
   );
 }
