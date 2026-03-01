@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function DashboardPage() {
   const { user, loading, logout } = useAuth();
@@ -12,27 +12,21 @@ export default function DashboardPage() {
     if (!loading && !user) {
       router.push('/login');
     }
-  }, [loading, user, router]);
+  }, [user, loading, router]);
 
-  if (loading) {
-    return <p className="text-sm text-slate-300">Loading...</p>;
-  }
-
-  if (!user) {
-    return null;
-  }
+  if (loading) return <div className="p-8">Loading...</div>;
+  if (!user) return null;
 
   return (
-    <section className="space-y-6">
-      <h1 className="text-2xl font-semibold text-slate-100">Dashboard</h1>
-      <p className="text-slate-300">Welcome, {user.email}!</p>
+    <div className="p-8">
+      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+      <p>Welcome, {user.full_name || user.email}!</p>
       <button
-        type="button"
         onClick={logout}
-        className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-brand-400"
+        className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
       >
         Logout
       </button>
-    </section>
+    </div>
   );
 }
