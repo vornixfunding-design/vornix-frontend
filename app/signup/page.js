@@ -3,10 +3,8 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth';
 
 export default function SignupPage() {
-  const { register, verifyOtp, resendOtp } = useAuth();
   const router = useRouter();
 
   const [step, setStep] = useState('signup');
@@ -32,7 +30,20 @@ export default function SignupPage() {
     setMessage('');
 
     try {
-      await register(email, password, fullName);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, full_name: fullName }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'Registration failed.');
+      }
+
       localStorage.setItem('pendingSignupEmail', email);
       setStep('otp');
       setMessage('Registration successful. Please verify your email with the OTP.');
@@ -47,7 +58,28 @@ export default function SignupPage() {
     setMessage('');
 
     try {
-      await verifyOtp(email, otp);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, otp }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'OTP verification failed.');
+      }
+
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
+
+      if (data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
+
       localStorage.removeItem('pendingSignupEmail');
       router.push('/dashboard');
     } catch (err) {
@@ -60,7 +92,20 @@ export default function SignupPage() {
     setMessage('');
 
     try {
-      await resendOtp(email);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/resend-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'Failed to resend OTP.');
+      }
+
       setMessage('A new OTP has been sent to your email.');
     } catch (err) {
       setError(err.message);
