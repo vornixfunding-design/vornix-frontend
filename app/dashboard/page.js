@@ -1,91 +1,38 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-
-export const dynamic = "force-dynamic";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth';
 
 export default function DashboardPage() {
-  const [loading, setLoading] = useState(true);
+  const { user, loading, logout } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    const enforceAuthentication = async () => {
-      const token = localStorage.getItem("vornix_token");
-
-      if (!token) {
-        window.location.replace("/login");
-        return;
-      }
-
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          localStorage.removeItem("vornix_token");
-          window.location.replace("/login");
-          return;
-        }
-
-        setLoading(false);
-      } catch {
-        localStorage.removeItem("vornix_token");
-        window.location.replace("/login");
-      }
-    };
-
-    enforceAuthentication();
-  }, []);
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [loading, router, user]);
 
   if (loading) {
-    return (
-      <section className="flex min-h-[60vh] items-center justify-center bg-slate-950">
-        <div className="rounded-xl border border-slate-800 bg-slate-900 px-6 py-4 shadow-lg">
-          <p className="text-sm font-medium text-slate-200">Authenticating...</p>
-        </div>
-      </section>
-    );
+    return <p className="text-sm text-slate-300">Loading...</p>;
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (
-    <section className="space-y-8">
-      <div>
-        <h1 className="page-title">Dashboard</h1>
-        <p className="page-subtitle">
-          Your operational command center for monitoring activity across the Vornix platform.
-        </p>
-      </div>
-
-      <article className="card">
-        <h2 className="text-lg font-semibold text-slate-100">System Health</h2>
-        <p className="mt-2 text-sm text-slate-300">Backend Status: Connected ✅</p>
-      </article>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <article className="card">
-          <h2 className="text-lg font-semibold text-slate-100">Evaluation Workspace</h2>
-          <p className="mt-2 text-sm text-slate-400">
-            Move into the evaluation module to review profiles and manage verification workflows.
-          </p>
-          <Link href="/dashboard/evaluation" className="mt-4 inline-block text-sm text-brand-300 hover:text-brand-200">
-            Open evaluation
-          </Link>
-        </article>
-
-        <article className="card">
-          <h2 className="text-lg font-semibold text-slate-100">Account Oversight</h2>
-          <p className="mt-2 text-sm text-slate-400">
-            Access account-level controls, permissions, and profile maintenance from a single panel.
-          </p>
-          <Link href="/dashboard/account" className="mt-4 inline-block text-sm text-brand-300 hover:text-brand-200">
-            Open account center
-          </Link>
-        </article>
-      </div>
+    <section className="space-y-6">
+      <h1 className="text-2xl font-semibold text-slate-100">Dashboard</h1>
+      <p className="text-slate-300">Welcome, {user.email || user.name || 'Trader'}!</p>
+      <button
+        type="button"
+        onClick={logout}
+        className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-brand-400"
+      >
+        Logout
+      </button>
     </section>
   );
 }
