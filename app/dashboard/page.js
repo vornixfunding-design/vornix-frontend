@@ -12,7 +12,7 @@ export default function DashboardPage() {
     if (!loading && !user) {
       router.push('/login');
     }
-  }, [loading, router, user]);
+  }, [loading, user, router]);
 
   if (loading) {
     return <p className="text-sm text-slate-300">Loading...</p>;
@@ -25,7 +25,7 @@ export default function DashboardPage() {
   return (
     <section className="space-y-6">
       <h1 className="text-2xl font-semibold text-slate-100">Dashboard</h1>
-      <p className="text-slate-300">Welcome, {user.email || user.name || 'Trader'}!</p>
+      <p className="text-slate-300">Welcome, {user.email}!</p>
       <button
         type="button"
         onClick={logout}
