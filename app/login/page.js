@@ -1,79 +1,66 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LoginPage() {
-  const { login } = useAuth();
-  const router = useRouter();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { login } = useAuth();
+  const router = useRouter();
 
-  async function handleLogin(event) {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setError('');
-
     try {
       await login(email, password);
       router.push('/dashboard');
     } catch (err) {
       setError(err.message);
     }
-  }
+  };
 
   return (
-    <section className="mx-auto max-w-md space-y-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-8">
-      <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-semibold text-slate-100">Login</h1>
-        <p className="text-sm text-slate-400">Log in with your email and password.</p>
-      </div>
-
-      {error ? <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2 text-sm text-red-300">{error}</p> : null}
-
-      <form className="space-y-4" onSubmit={handleLogin}>
-        <div className="space-y-1">
-          <label className="block text-sm text-slate-300" htmlFor="email">
-            Email
-          </label>
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow rounded">
+      <h1 className="text-2xl font-bold mb-4">Log in</h1>
+      {error && <p className="text-red-500 mb-2">{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Email</label>
           <input
-            id="email"
             type="email"
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border rounded px-3 py-2"
             required
-            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none ring-brand-400 transition focus:ring-2"
           />
         </div>
-
-        <div className="space-y-1">
-          <label className="block text-sm text-slate-300" htmlFor="password">
-            Password
-          </label>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Password</label>
           <input
-            id="password"
             type="password"
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full border rounded px-3 py-2"
             required
-            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none ring-brand-400 transition focus:ring-2"
           />
         </div>
-
-        <button type="submit" className="w-full rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-brand-400">
-          Login
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+          Log in
         </button>
       </form>
-
-      <p className="text-center text-sm text-slate-400">
-        Don&apos;t have an account?{' '}
-        <Link href="/signup" className="text-brand-400 hover:text-brand-300">
+      <p className="mt-4 text-sm">
+        Don't have an account?{' '}
+        <Link href="/signup" className="text-blue-600 hover:underline">
           Sign up
         </Link>
       </p>
-    </section>
+    </div>
   );
 }
