@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 
@@ -17,6 +17,15 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
+  useEffect(() => {
+    const pendingEmail = localStorage.getItem('pendingSignupEmail');
+
+    if (pendingEmail) {
+      setEmail(pendingEmail);
+      setStep('otp');
+    }
+  }, []);
+
   async function handleSignup(event) {
     event.preventDefault();
     setError('');
@@ -24,6 +33,7 @@ export default function SignupPage() {
 
     try {
       await register(email, password, fullName);
+      localStorage.setItem('pendingSignupEmail', email);
       setStep('otp');
       setMessage('Registration successful. Please verify your email with the OTP.');
     } catch (err) {
@@ -38,6 +48,7 @@ export default function SignupPage() {
 
     try {
       await verifyOtp(email, otp);
+      localStorage.removeItem('pendingSignupEmail');
       router.push('/dashboard');
     } catch (err) {
       setError(err.message);
